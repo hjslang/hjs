@@ -5,6 +5,7 @@ go 1.24
 require (
 	github.com/stretchr/testify v1.11.1
 	github.com/xjslang/xjs v0.9.3-alpha
+	github.com/xorcare/golden v0.8.4
 )
 
 require (

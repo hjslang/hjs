@@ -15,9 +15,15 @@ var (
 	concatTag = token.RegisterType("concat")
 )
 
+type Attr struct {
+	Name  *js.Ident
+	Value ast.Expr
+}
+
 type Tag struct {
 	ast.BaseExpr
 	Name     *js.Ident
+	Attrs    []Attr
 	Children ast.Expr
 }
 
@@ -34,6 +40,25 @@ func ParseTag(p *parser.Parser) (_ *Tag, err error) {
 	}
 	if node.Name, err = js.ParseIdent(p); err != nil {
 		return
+	}
+	for p.CurrentToken.Type != token.GT {
+		var attr Attr
+		if attr.Name, err = js.ParseIdent(p); err != nil {
+			return
+		}
+		if _, err = p.Expect(token.ASSIGN); err != nil {
+			return
+		}
+		if _, err = p.Expect(token.LBRACE); err != nil {
+			return
+		}
+		if attr.Value, err = p.ParseExpr(); err != nil {
+			return
+		}
+		if _, err = p.Expect(token.RBRACE); err != nil {
+			return
+		}
+		node.Attrs = append(node.Attrs, attr)
 	}
 	if _, err = p.Expect(token.GT); err != nil {
 		return

@@ -1,0 +1,1 @@
+let msg = 'Hello, World!';let handleClick = function () {console.log('Hello, Mars!');};let btn = (function(){const elem = document.createElement('button');elem.setAttribute('type', "button");elem.addEventListener('click', handleClick);elem.append(msg);return elem})();

@@ -6,6 +6,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 	"github.com/xjslang/xjs/printer"
+	"github.com/xorcare/golden"
 )
 
 func ExampleCompile() {
@@ -60,6 +61,20 @@ func TestParse(t *testing.T) {
 }
 
 func TestCompile(t *testing.T) {
+	input := `
+	let msg = 'Hello, World!'
+	let handleClick = function () {
+		console.log('Hello, Mars!')
+	}
+	let btn = <button type={"button"} onClick={handleClick}>
+		msg
+	</button>`
+	result, err := Parse([]byte(input))
+	require.NoError(t, err)
+	code, err := Compile(result)
+	require.NoError(t, err)
+	golden.Assert(t, []byte(code))
+
 	t.Run("empty tag", func(t *testing.T) {
 		input := `let p = <p></p>`
 		result, err := Parse([]byte(input))
@@ -71,6 +86,20 @@ func TestCompile(t *testing.T) {
 }
 
 func TestFormat(t *testing.T) {
+	input := `
+	let msg = 'Hello, World!'
+	let handleClick = function () {
+		console.log('Hello, Mars!')
+	}
+	let btn = <button type={"button"} onClick={handleClick}>
+		msg
+	</button>`
+	result, err := Parse([]byte(input))
+	require.NoError(t, err)
+	code, err := Format(result)
+	require.NoError(t, err)
+	golden.Assert(t, []byte(code))
+
 	t.Run("empty tags", func(t *testing.T) {
 		input := `let p = <p></p>`
 		result, err := Parse([]byte(input))
