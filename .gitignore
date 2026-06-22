@@ -1,0 +1,31 @@
+# IDE files
+# Note: .vscode/settings.json is tracked for team consistency
+.vscode/*
+!.vscode/settings.json
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# Coverage reports
+coverage.html
+coverage.out
+profile.out
+
+# Temporary files
+*.tmp
+*.temp
