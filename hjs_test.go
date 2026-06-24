@@ -155,3 +155,30 @@ func TestFormat(t *testing.T) {
 		require.Equal(t, expectedCode, code)
 	})
 }
+
+func TestRxCompile(t *testing.T) {
+	input := `
+	let $msg = 'Hello, World!'
+	let handleClick = function () {
+		$msg = 'Hello, Mars!'
+	}
+	let btn = <button type="button" onClick=handleClick>
+		$msg
+	</button>`
+
+	t.Run("compile", func(t *testing.T) {
+		result, err := Parse([]byte(input))
+		require.NoError(t, err)
+		code, err := Compile(result, WithRuntime())
+		require.NoError(t, err)
+		golden.Assert(t, []byte(code))
+	})
+
+	t.Run("format", func(t *testing.T) {
+		result, err := Parse([]byte(input))
+		require.NoError(t, err)
+		code, err := Format(result)
+		require.NoError(t, err)
+		golden.Assert(t, []byte(code))
+	})
+}

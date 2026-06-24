@@ -1,0 +1,17 @@
+function rx(initVal) {
+  let _val = initVal;
+  let _listeners = [];
+  return {
+    get: function () {
+      return _val;
+    },
+    set: function (val) {
+      _val = val;
+      for (let listener of _listeners) {
+        listener();
+      }
+    },
+  };
+}
+
+let $msg = rx('Hello, World!');let handleClick = function () {$msg.set('Hello, Mars!');};let btn = (function(){const elem = document.createElement('button');elem.setAttribute('type', "button");elem.addEventListener('click', handleClick);elem.append($msg.get());return elem})();
