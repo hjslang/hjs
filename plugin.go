@@ -21,6 +21,10 @@ type Attr struct {
 
 type Tag struct {
 	ast.BaseExpr
+	Layout struct {
+		StartTag token.Token
+		EndTag   token.Token
+	}
 	Name     *js.Ident
 	Attrs    []Attr
 	Children []ast.Expr
@@ -28,7 +32,7 @@ type Tag struct {
 
 func ParseTag(p *parser.Parser) (_ *Tag, err error) {
 	node := &Tag{}
-	if _, err = p.Expect(startTag); err != nil {
+	if node.Layout.StartTag, err = p.Expect(startTag); err != nil {
 		return
 	}
 	if node.Name, err = js.ParseIdent(p); err != nil {
@@ -63,7 +67,7 @@ func ParseTag(p *parser.Parser) (_ *Tag, err error) {
 		}
 		node.Children = append(node.Children, child)
 	}
-	if _, err = p.Expect(endTag); err != nil {
+	if node.Layout.EndTag, err = p.Expect(endTag); err != nil {
 		return
 	}
 	var ident *js.Ident

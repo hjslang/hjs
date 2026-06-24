@@ -8,17 +8,17 @@ import (
 func Formatter(pr *printer.Printer, node ast.Node, next func(node ast.Node) error) error {
 	switch v := node.(type) {
 	case *Tag:
-		pr.SpPrint("<").Print(v.Name)
+		pr.SpPrint(v.Layout.StartTag).Print(v.Name)
 		for _, a := range v.Attrs {
 			pr.SpPrint(a.Name).Print("={", a.Value, "}")
 		}
 		pr.Print(">")
 		pr.IncreaseIndent()
 		for _, child := range v.Children {
-			pr.LnPrint(child)
+			pr.Print(child)
 		}
 		pr.DecreaseIndent()
-		pr.LnPrint("</").Print(v.Name, ">")
+		pr.Print(v.Layout.EndTag, v.Name, ">")
 	default:
 		return next(node)
 	}

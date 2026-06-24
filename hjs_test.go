@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/xjslang/xjs/printer"
 	"github.com/xorcare/golden"
@@ -31,7 +32,11 @@ func ExampleCompile() {
 
 func ExampleFormat() {
 	// transform the input to AST
-	input := `let p = <p>"Hello, "<strong>"World!"</strong></p>`
+	input := `let p = <p>
+		"Hello, "<strong>
+		"World!"
+		</strong>
+		</p>`
 	result, err := Parse([]byte(input))
 	if err != nil {
 		panic(err)
@@ -100,28 +105,53 @@ func TestFormat(t *testing.T) {
 	require.NoError(t, err)
 	golden.Assert(t, []byte(code))
 
+	t.Run("preserve newlines", func(t *testing.T) {
+		tests := []struct {
+			input, expected string
+		}{
+			{"<p>'Hello, World!'</p>", "<p>'Hello, World!'</p>;"},
+			{"<p>\n'Hello, World!'</p>", "<p>\n\t'Hello, World!'</p>;"},
+			{"<p>\n'Hello, World!'\n</p>", "<p>\n\t'Hello, World!'\n</p>;"},
+			{"<p>\n'Hello, '<b>'World!'</b>\n</p>", "<p>\n\t'Hello, ' <b>'World!'</b>\n</p>;"},
+			{"<p>\n'Hello, '\n<b>'World!'</b>\n</p>", "<p>\n\t'Hello, '\n\t<b>'World!'</b>\n</p>;"},
+		}
+		for _, test := range tests {
+			result, err := Parse([]byte(test.input))
+			if !assert.NoError(t, err) {
+				continue
+			}
+			code, err := Format(result, printer.WithIndent("\t"))
+			if !assert.NoError(t, err) {
+				continue
+			}
+			assert.Equal(t, test.expected, code)
+		}
+	})
+
 	t.Run("empty tags", func(t *testing.T) {
 		input := `let p = <p></p>`
 		result, err := Parse([]byte(input))
 		require.NoError(t, err)
 		out, err := Format(result)
 		require.NoError(t, err)
-		require.Equal(t, "let p = <p>\n</p>;", out)
+		require.Equal(t, "let p = <p></p>;", out)
 	})
-	t.Run("with comments", func(t *testing.T) {
+
+	t.Run("comments", func(t *testing.T) {
 		input := `let p = <p>
 		// c1
 		"Hello, "
 		<strong>
 		/* c2 */
-		"World!"</strong></p>`
+		"World!" // c3
+		</strong>/* c4 */</p>`
 		result, err := Parse([]byte(input))
 		require.NoError(t, err)
 
 		// transform the AST to properly formatted code
 		code, err := Format(result, printer.WithIndent("\t"))
 		require.NoError(t, err)
-		expectedCode := "let p = <p>\n\t// c1\n\t\"Hello, \" <strong>\n\t\t/* c2 */\n\t\t\"World!\"\n\t</strong>\n</p>;"
+		expectedCode := "let p = <p>\n\t// c1\n\t\"Hello, \"\n\t<strong>\n\t\t/* c2 */\n\t\t\"World!\" // c3\n\t</strong> /* c4 */</p>;"
 		require.Equal(t, expectedCode, code)
 	})
 }
