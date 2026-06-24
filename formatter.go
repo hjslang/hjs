@@ -10,7 +10,7 @@ func Formatter(pr *printer.Printer, node ast.Node, next func(node ast.Node) erro
 	case *Tag:
 		pr.SpPrint(v.Layout.StartTag).Print(v.Name)
 		for _, a := range v.Attrs {
-			pr.SpPrint(a.Name).Print("={", a.Value, "}")
+			pr.SpPrint(a.Name).Print("=", a.Value)
 		}
 		pr.Print(">")
 		pr.IncreaseIndent()

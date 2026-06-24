@@ -3,6 +3,6 @@ let msg = 'Hello, World!';
 let handleClick = function () {
   console.log('Hello, Mars!');
 };
-let btn = <button type={"button"} onClick={handleClick}>
+let btn = <button type="button" onClick=handleClick>
   msg
 </button>;

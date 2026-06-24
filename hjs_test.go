@@ -71,7 +71,7 @@ func TestCompile(t *testing.T) {
 	let handleClick = function () {
 		console.log('Hello, Mars!')
 	}
-	let btn = <button type={"button"} onClick={handleClick}>
+	let btn = <button type="button" onClick=handleClick>
 		msg
 	</button>`
 	result, err := Parse([]byte(input))
@@ -96,7 +96,7 @@ func TestFormat(t *testing.T) {
 	let handleClick = function () {
 		console.log('Hello, Mars!')
 	}
-	let btn = <button type={"button"} onClick={handleClick}>
+	let btn = <button type="button" onClick=handleClick>
 		msg
 	</button>`
 	result, err := Parse([]byte(input))

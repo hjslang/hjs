@@ -46,13 +46,7 @@ func ParseTag(p *parser.Parser) (_ *Tag, err error) {
 		if _, err = p.Expect(token.ASSIGN); err != nil {
 			return
 		}
-		if _, err = p.Expect(token.LBRACE); err != nil {
-			return
-		}
-		if attr.Value, err = p.ParseExpr(); err != nil {
-			return
-		}
-		if _, err = p.Expect(token.RBRACE); err != nil {
+		if attr.Value, err = js.ParseValue(p); err != nil {
 			return
 		}
 		node.Attrs = append(node.Attrs, attr)
