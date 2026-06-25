@@ -1,3 +1,5 @@
+# HJS - HTML for JavaScript
+
 A JavaScript dialect with native HTML support. This project was built on top of [XJS](https://github.com/xjslang/xjs), an experimental parsing tool.
 
 ## Example
@@ -55,4 +57,23 @@ func main() {
 	// Output:
 	// let p = (function(){const elem = document.createElement('p');...
 }
+```
+
+## Dev
+
+**Architecture:**
+
+```
+./compiler.go  -- transform AST to valid JS code
+./formatter.go -- transform AST to propertly formatted code
+./plugin.go    -- enrich the XJS parser
+./hjs.go       -- entry point
+./hjs_test.go  -- integration tests
+```
+
+**Main mage commands:**
+```bash
+mage lint # check source code for errors
+mage test # execute tests
+mage -l   # complete list of commands
 ```
