@@ -1,4 +1,4 @@
-package html
+package hjs
 
 import (
 	"github.com/xjslang/xjs/ast"

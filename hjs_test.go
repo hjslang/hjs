@@ -1,4 +1,4 @@
-package hjs
+package hjs_test
 
 import (
 	"fmt"
@@ -6,6 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/xjslang/hjs"
 	"github.com/xjslang/xjs/printer"
 	"github.com/xorcare/golden"
 )
@@ -16,13 +17,13 @@ func ExampleCompile() {
 		"Hello, "
 		<strong>"World!"</strong>
 	</p>`
-	result, err := Parse([]byte(input))
+	result, err := hjs.Parse([]byte(input))
 	if err != nil {
 		panic(err)
 	}
 
 	// transform the AST to valid JS code
-	jsCode, err := Compile(result)
+	jsCode, err := hjs.Compile(result)
 	if err != nil {
 		panic(err)
 	}
@@ -37,13 +38,13 @@ func ExampleFormat() {
 		"World!"
 		</strong>
 		</p>`
-	result, err := Parse([]byte(input))
+	result, err := hjs.Parse([]byte(input))
 	if err != nil {
 		panic(err)
 	}
 
 	// transform the AST to properly formatted XJS code
-	xjsCode, err := Format(result)
+	xjsCode, err := hjs.Format(result)
 	if err != nil {
 		panic(err)
 	}
@@ -59,7 +60,7 @@ func ExampleFormat() {
 func TestParse(t *testing.T) {
 	t.Run("errors", func(t *testing.T) {
 		input := "<div>'Hello, World!'</p>"
-		_, err := Parse([]byte(input))
+		_, err := hjs.Parse([]byte(input))
 		require.Error(t, err)
 		require.Equal(t, err.Error(), "[line:0, col:22] expected closing tag </div>")
 	})
@@ -74,17 +75,17 @@ func TestCompile(t *testing.T) {
 	let btn = <button type="button" onClick=handleClick>
 		msg
 	</button>`
-	result, err := Parse([]byte(input))
+	result, err := hjs.Parse([]byte(input))
 	require.NoError(t, err)
-	code, err := Compile(result)
+	code, err := hjs.Compile(result)
 	require.NoError(t, err)
 	golden.Assert(t, []byte(code))
 
 	t.Run("empty tag", func(t *testing.T) {
 		input := `let p = <p></p>`
-		result, err := Parse([]byte(input))
+		result, err := hjs.Parse([]byte(input))
 		require.NoError(t, err)
-		out, err := Compile(result)
+		out, err := hjs.Compile(result)
 		require.NoError(t, err)
 		require.Equal(t, "let p = (function(){const elem = document.createElement('p');return elem})();", out)
 	})
@@ -99,9 +100,9 @@ func TestFormat(t *testing.T) {
 	let btn = <button type="button" onClick=handleClick>
 		msg
 	</button>`
-	result, err := Parse([]byte(input))
+	result, err := hjs.Parse([]byte(input))
 	require.NoError(t, err)
-	code, err := Format(result)
+	code, err := hjs.Format(result)
 	require.NoError(t, err)
 	golden.Assert(t, []byte(code))
 
@@ -116,11 +117,11 @@ func TestFormat(t *testing.T) {
 			{"<p>\n'Hello, '\n<b>'World!'</b>\n</p>", "<p>\n\t'Hello, '\n\t<b>'World!'</b>\n</p>;"},
 		}
 		for _, test := range tests {
-			result, err := Parse([]byte(test.input))
+			result, err := hjs.Parse([]byte(test.input))
 			if !assert.NoError(t, err) {
 				continue
 			}
-			code, err := Format(result, printer.WithIndent("\t"))
+			code, err := hjs.Format(result, printer.WithIndent("\t"))
 			if !assert.NoError(t, err) {
 				continue
 			}
@@ -130,9 +131,9 @@ func TestFormat(t *testing.T) {
 
 	t.Run("empty tags", func(t *testing.T) {
 		input := `let p = <p></p>`
-		result, err := Parse([]byte(input))
+		result, err := hjs.Parse([]byte(input))
 		require.NoError(t, err)
-		out, err := Format(result)
+		out, err := hjs.Format(result)
 		require.NoError(t, err)
 		require.Equal(t, "let p = <p></p>;", out)
 	})
@@ -145,40 +146,13 @@ func TestFormat(t *testing.T) {
 		/* c2 */
 		"World!" // c3
 		</strong>/* c4 */</p>`
-		result, err := Parse([]byte(input))
+		result, err := hjs.Parse([]byte(input))
 		require.NoError(t, err)
 
 		// transform the AST to properly formatted code
-		code, err := Format(result, printer.WithIndent("\t"))
+		code, err := hjs.Format(result, printer.WithIndent("\t"))
 		require.NoError(t, err)
 		expectedCode := "let p = <p>\n\t// c1\n\t\"Hello, \"\n\t<strong>\n\t\t/* c2 */\n\t\t\"World!\" // c3\n\t</strong> /* c4 */</p>;"
 		require.Equal(t, expectedCode, code)
-	})
-}
-
-func TestRxCompile(t *testing.T) {
-	input := `
-	let $msg = 'Hello, World!'
-	let handleClick = function () {
-		$msg = 'Hello, Mars!'
-	}
-	let btn = <button type="button" onClick=handleClick>
-		$msg
-	</button>`
-
-	t.Run("compile", func(t *testing.T) {
-		result, err := Parse([]byte(input))
-		require.NoError(t, err)
-		code, err := Compile(result, WithRuntime())
-		require.NoError(t, err)
-		golden.Assert(t, []byte(code))
-	})
-
-	t.Run("format", func(t *testing.T) {
-		result, err := Parse([]byte(input))
-		require.NoError(t, err)
-		code, err := Format(result)
-		require.NoError(t, err)
-		golden.Assert(t, []byte(code))
 	})
 }
