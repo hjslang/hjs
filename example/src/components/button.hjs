@@ -1,0 +1,11 @@
+export function button() {
+	function handleClick() {
+		alert('Button clicked!');
+	}
+
+	return (
+		<button type="button" onClick=handleClick>
+			"Click me!"
+		</button>
+	);
+}

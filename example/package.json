@@ -1,0 +1,19 @@
+{
+  "name": "example-html",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node scripts/dev.cjs",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Gonzalo Chumillas (https://github.com/gchumillas)",
+  "license": "MIT",
+  "type": "commonjs",
+  "devDependencies": {
+    "chokidar": "^4.0.3",
+    "live-server": "^1.2.2",
+    "rimraf": "^6.1.3"
+  }
+}

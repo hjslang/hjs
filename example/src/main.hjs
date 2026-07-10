@@ -1,0 +1,7 @@
+import { button } from './components/button.js'
+
+function main() {
+	return <div>button()</div>;
+}
+
+export { main };

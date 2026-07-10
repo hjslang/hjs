@@ -34,9 +34,9 @@ func main() {
 	} else {
 		cmd := os.Args[0]
 		fmt.Fprint(os.Stderr, "Usage:\n\n")
-		fmt.Fprintf(os.Stderr, "\t%s <file.djs>\n", cmd)
-		fmt.Fprintf(os.Stderr, "\t%s -format <file.djs>\n", cmd)
-		fmt.Fprintf(os.Stderr, "\t%s -check <file.djs>\n", cmd)
+		fmt.Fprintf(os.Stderr, "\t%s <file.hjs>\n", cmd)
+		fmt.Fprintf(os.Stderr, "\t%s -format <file.hjs>\n", cmd)
+		fmt.Fprintf(os.Stderr, "\t%s -check <file.hjs>\n", cmd)
 		fmt.Fprintf(os.Stderr, "\t%s -check -stdin <<< \"DJS code\"\n", cmd)
 		fmt.Fprint(os.Stderr, "\n")
 		os.Exit(2)
