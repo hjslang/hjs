@@ -35,5 +35,5 @@ func UpdateGoldenFiles() error {
 }
 
 func BuildWasm() error {
-	return sh.RunV("tinygo", "build", "-o", "docs/compiler.wasm", "-target", "wasm", "./cmd/main_js.go")
+	return sh.RunV("tinygo", "build", "-o", "docs/compiler.wasm", "-target", "wasm", "./cmd/web")
 }
