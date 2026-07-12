@@ -31,11 +31,7 @@ issues:
   max-issues-per-linter: 0
   max-same-issues: 0
   exclude-rules:
-    # Allow reflection-using packages in test files
-    - path: _test\.go
-      linters:
-        - depguard
-    # Allow internal package to use reflection internally
-    - path: internal/
+    # Allow reflection-using packages
+    - path: (_test\.go|internal/|cmd/hjs/)
       linters:
         - depguard

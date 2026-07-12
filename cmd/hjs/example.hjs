@@ -1,0 +1,11 @@
+function button() {
+  let handleClick = function() {
+    alert('hi there!')
+  }
+
+  return <button onClick=handleClick>
+    "Click me!"
+  </button>
+}
+
+button()
