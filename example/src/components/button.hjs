@@ -1,11 +1,22 @@
+import { ctx } from '../context.hjs'
+
 export function button() {
+	let efs = ctx.effects()
+	let txt = ctx.signal('Click me!')
+
 	function handleClick() {
-		alert('Button clicked!');
+		txt.set('Button clicked!')
 	}
 
-	return (
+	let btn = (
 		<button type="button" onClick=handleClick>
-			"Click me!"
+			txt.get()
 		</button>
 	);
+
+	efs.effect(function () {
+		btn.innerText = txt.get()
+	})
+
+	return btn
 }
