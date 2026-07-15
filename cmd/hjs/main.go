@@ -37,7 +37,7 @@ func main() {
 		fmt.Fprintf(os.Stderr, "\t%s <file.hjs>\n", cmd)
 		fmt.Fprintf(os.Stderr, "\t%s -format <file.hjs>\n", cmd)
 		fmt.Fprintf(os.Stderr, "\t%s -check <file.hjs>\n", cmd)
-		fmt.Fprintf(os.Stderr, "\t%s -check -stdin <<< \"DJS code\"\n", cmd)
+		fmt.Fprintf(os.Stderr, "\t%s -check -stdin <<< \"HJS code\"\n", cmd)
 		fmt.Fprint(os.Stderr, "\n")
 		os.Exit(2)
 	}
