@@ -1,10 +1,14 @@
-# HJS - HTML for JavaScript
+<div align="center">
 
-A JavaScript dialect with native HTML support. This project was built on top of [XJS](https://github.com/xjslang/xjs), an experimental parsing tool.
+![HJS Logo](assets/logo.svg)
 
-## Playground
+# HJS &ndash; HTML for JavaScript
 
-https://xjslang.github.io/hjs/
+A JavaScript dialect with native HTML support.
+
+[Playground](https://xjslang.github.io/hjs/)
+
+</div>
 
 ## How to use it
 
