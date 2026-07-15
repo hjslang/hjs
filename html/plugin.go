@@ -10,8 +10,9 @@ import (
 )
 
 var (
-	startTag = token.RegisterType("start-tag")
-	endTag   = token.RegisterType("end-tag")
+	startTag       = token.RegisterType("<")
+	endTag         = token.RegisterType("</")
+	selfClosingTag = token.RegisterType("/>")
 )
 
 type Attr struct {
@@ -22,23 +23,28 @@ type Attr struct {
 type Tag struct {
 	ast.BaseExpr
 	Layout struct {
-		StartTag token.Token
-		EndTag   token.Token
+		StartTag       token.Token
+		EndTag         token.Token
+		SelfClosingTag token.Token
 	}
-	Name     *js.Ident
-	Attrs    []Attr
-	Children []ast.Expr
+	SelfClosing bool
+	Name        *js.Ident
+	Attrs       []Attr
+	Children    []ast.Expr
 }
 
-func parseTag(p *parser.Parser) (_ *Tag, err error) {
-	node := &Tag{}
+func parseTag(p *parser.Parser) (node *Tag, err error) {
+	node = &Tag{}
 	if node.Layout.StartTag, err = p.Expect(startTag); err != nil {
 		return
 	}
 	if node.Name, err = js.ParseIdent(p); err != nil {
 		return
 	}
-	for p.CurrentToken.Type != token.GT {
+	for {
+		if typ := p.CurrentToken.Type; typ == token.GT || typ == selfClosingTag {
+			break
+		}
 		var attr Attr
 		if attr.Name, err = js.ParseIdent(p); err != nil {
 			return
@@ -51,7 +57,12 @@ func parseTag(p *parser.Parser) (_ *Tag, err error) {
 		}
 		node.Attrs = append(node.Attrs, attr)
 	}
-	if _, err = p.Expect(token.GT); err != nil {
+	if p.CurrentToken.Type == selfClosingTag {
+		node.SelfClosing = true
+		node.Layout.SelfClosingTag = p.CurrentToken
+		p.AdvanceToken()
+		return
+	} else if _, err = p.Expect(token.GT); err != nil {
 		return
 	}
 	for p.CurrentToken.Type != endTag {
@@ -77,7 +88,7 @@ func parseTag(p *parser.Parser) (_ *Tag, err error) {
 	if _, err = p.Expect(token.GT); err != nil {
 		return
 	}
-	return node, nil
+	return
 }
 
 // Plugin enriches the JavaScript parser, so that we can parse expressions that are not part of the JS standard.
@@ -89,7 +100,8 @@ func Plugin(b *plugin.Builder) {
 		if tok, err = next(); err != nil {
 			return
 		}
-		if tok.Type == token.LT {
+		switch tok.Type {
+		case token.LT:
 			c := sc.CurrentChar()
 			switch {
 			case scanner.IsLetter(c):
@@ -98,6 +110,12 @@ func Plugin(b *plugin.Builder) {
 				sc.AdvanceChar()
 				tok.Type = endTag
 				tok.Literal = "</"
+			}
+		case token.DIVIDE:
+			if sc.CurrentChar() == '>' {
+				sc.AdvanceChar()
+				tok.Type = selfClosingTag
+				tok.Literal = "/>"
 			}
 		}
 		return

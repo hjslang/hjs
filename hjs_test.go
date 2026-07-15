@@ -15,6 +15,7 @@ func ExampleCompile() {
 	// transform the input to AST
 	input := `let p = <p>
 		"Hello, "
+		<span />
 		<strong>"World!"</strong>
 	</p>`
 	result, err := hjs.Parse([]byte(input))
@@ -28,13 +29,14 @@ func ExampleCompile() {
 		panic(err)
 	}
 	fmt.Println(jsCode)
-	// Output: let p = (function(){const elem = document.createElement('p');elem.append("Hello, ");elem.append((function(){const elem = document.createElement('strong');elem.append("World!");return elem})());return elem})();
+	// Output: let p = (function(){const elem = document.createElement('p');elem.append("Hello, ");elem.append((function(){const elem = document.createElement('span');return elem})());elem.append((function(){const elem = document.createElement('strong');elem.append("World!");return elem})());return elem})();
 }
 
 func ExampleFormat() {
 	// transform the input to AST
 	input := `let p = <p>
-		"Hello, "<strong>
+		"Hello, "
+		<span /><strong>
 		"World!"
 		</strong>
 		</p>`
@@ -51,7 +53,8 @@ func ExampleFormat() {
 	fmt.Println(xjsCode)
 	// Output:
 	// let p = <p>
-	//   "Hello, " <strong>
+	//   "Hello, "
+	//   <span /> <strong>
 	//     "World!"
 	//   </strong>
 	// </p>;
@@ -74,7 +77,10 @@ func TestCompile(t *testing.T) {
 	}
 	let btn = <button type="button" onClick=handleClick>
 		msg
-	</button>`
+	</button>
+	
+	let div1 = <div></div>
+	let div2 = <div /> // self closing`
 	result, err := hjs.Parse([]byte(input))
 	require.NoError(t, err)
 	code, err := hjs.Compile(result)
@@ -99,7 +105,10 @@ func TestFormat(t *testing.T) {
 	}
 	let btn = <button type="button" onClick=handleClick>
 		msg
-	</button>`
+	</button>
+	
+	let div1 = <div></div>
+	let div2 = <div /> // self closing`
 	result, err := hjs.Parse([]byte(input))
 	require.NoError(t, err)
 	code, err := hjs.Format(result)
@@ -145,14 +154,17 @@ func TestFormat(t *testing.T) {
 		<strong>
 		/* c2 */
 		"World!" // c3
-		</strong>/* c4 */</p>`
+		</strong>/* c4 */</p>
+		
+		let div = <div // c
+		/>`
 		result, err := hjs.Parse([]byte(input))
 		require.NoError(t, err)
 
 		// transform the AST to properly formatted code
 		code, err := hjs.Format(result, printer.WithIndent("\t"))
 		require.NoError(t, err)
-		expectedCode := "let p = <p>\n\t// c1\n\t\"Hello, \"\n\t<strong>\n\t\t/* c2 */\n\t\t\"World!\" // c3\n\t</strong> /* c4 */</p>;"
+		expectedCode := "let p = <p>\n\t// c1\n\t\"Hello, \"\n\t<strong>\n\t\t/* c2 */\n\t\t\"World!\" // c3\n\t</strong> /* c4 */</p>;\n\nlet div = <div // c\n/>;"
 		require.Equal(t, expectedCode, code)
 	})
 }

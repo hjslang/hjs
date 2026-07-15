@@ -6,3 +6,6 @@ let handleClick = function () {
 let btn = <button type="button" onClick=handleClick>
   msg
 </button>;
+
+let div1 = <div></div>;
+let div2 = <div />; // self closing

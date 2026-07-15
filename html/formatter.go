@@ -12,13 +12,17 @@ func Formatter(pr *printer.Printer, node ast.Node, next func(node ast.Node) erro
 		for _, a := range v.Attrs {
 			pr.Space().Print(a.Name, "=", a.Value)
 		}
-		pr.Print(">")
-		pr.IncreaseIndent()
-		for _, child := range v.Children {
-			pr.Print(child)
+		if v.SelfClosing {
+			pr.Space().Print(v.Layout.SelfClosingTag)
+		} else {
+			pr.Print(">")
+			pr.IncreaseIndent()
+			for _, child := range v.Children {
+				pr.Print(child)
+			}
+			pr.DecreaseIndent()
+			pr.Print(v.Layout.EndTag, v.Name, ">")
 		}
-		pr.DecreaseIndent()
-		pr.Print(v.Layout.EndTag, v.Name, ">")
 	default:
 		return next(node)
 	}
