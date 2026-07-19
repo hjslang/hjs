@@ -11,6 +11,16 @@
    xmlns:svg="http://www.w3.org/2000/svg">
   <defs
      id="defs1" />
+  <style>
+    path {
+      fill: #000000;
+    }
+    @media (prefers-color-scheme: dark) {
+      path {
+        fill: #FFF;
+      }
+    }
+  </style>
   <g
      id="layer1"
      transform="translate(-84.977598,-44.360578)">
