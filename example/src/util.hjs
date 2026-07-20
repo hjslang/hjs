@@ -1,27 +1,42 @@
 import udomdiff from 'udomdiff'
 import { ctx } from './context.hjs'
 
-export function diffChildren(parentNode, rows, insert) {
-	const ids = {}
-	for (const child of parentNode.children) {
-		if (child.dataset.id === undefined) {
-			throw new Error('All children must have dataset.id')
+export function diffChildren() {
+	const savedEffects = Object.create(null)
+
+	return function (parentNode, rows, insert) {
+		const ids = {}
+		const rowIdSet = new Set(rows.map(r => `${r.id}`))
+		for (const child of parentNode.children) {
+			const id = child.dataset.id
+			if (id === undefined) {
+				throw new Error('All children must have dataset.id')
+			}
+			if (!rowIdSet.has(id) && savedEffects[id]) {
+				// cleaning effects group
+				savedEffects[id].clean()
+				delete savedEffects[id]
+			}
+			ids[id] = child
 		}
-		ids[`${child.dataset.id}`] = child
+		let nodes = []
+		for (const row of rows) {
+			if (row.id === undefined || row.id === null) {
+				throw new Error('All rows must have an id property')
+			}
+			if (!savedEffects[row.id]) {
+				// creates an effects group per row
+				savedEffects[row.id] = ctx.effects()
+			}
+			nodes.push(ids[`${row.id}`] || insert(savedEffects[row.id].effect, row))
+		}
+		udomdiff(parentNode, [...parentNode.children], nodes, n => n)
 	}
-	const nodes = rows.map(row => {
-		if (row.id === undefined || row.id === null) {
-			throw new Error('All rows must have an id property')
-		}
-		return ids[`${row.id}`] || insert(row)
-	})
-	udomdiff(parentNode, [...parentNode.children], nodes, n => n)
 }
 
-export function Render(fn) {
-	const efs = ctx.effects()
+export function Render(effect, fn) {
 	let node = document.createTextNode('')
-	efs.effect(_ => {
+	effect(_ => {
 		node.textContent = fn()
 	})
 	return node

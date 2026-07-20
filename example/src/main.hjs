@@ -29,8 +29,7 @@ function Main() {
 		rows.set(rows.get().filter((row) => row.id != id))
 	}
 
-	// TODO: Row-scoped signals/effects are created (and Row even creates an effects group) but nothing ever calls efs.clean() when a row is removed. Deleting rows will leave effects registered in signals, causing memory growth and potentially executing effects for detached DOM nodes.
-	const  Row = (row) => {
+	const  Row = (effect, row) => {
 		const kcal100g = ctx.signal(row.kcal100g)
 		const total = ctx.signal(row.total)
 
@@ -60,17 +59,17 @@ function Main() {
 					value=(row.total)
 					onInput=(handleChangeTotal) />
 			</td>
-			<td>Render(_ => (kcal100g.get() * total.get() / 100).toFixed(2))</td>
+			<td>Render(effect, _ => (kcal100g.get() * total.get() / 100).toFixed(2))</td>
 			<td><button type="button" onClick=(() => handleAddRow(row.id))>"+"</button></td>
 			<td><button type="button" onClick=(() => handleDeleteRow(row.id))>"-"</button></td>
 		</tr>
 	}
 
 	const tbodyNode = <tbody />
+	const diff = diffChildren()
 	efs.effect(_ => {
-		diffChildren(tbodyNode, rows.get(), row => Row(row))
+		diff(tbodyNode, rows.get(), (effect, row) => Row(effect, row))
 	})
-
 	return <table>tbodyNode</table>
 }
 
