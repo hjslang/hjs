@@ -2,6 +2,7 @@ import { signal, Render } from '/libs/signals/html.js'
 import { ctx } from './context.hjs'
 
 export const Row = (row) => {
+	const { handleAddRow, handleDeleteRow } = ctx.use()
 	const kcal100g = signal(row.kcal100g)
 	const total = signal(row.total)
 
@@ -32,7 +33,7 @@ export const Row = (row) => {
 				onInput=(handleChangeTotal) />
 		</td>
 		<td>Render(_ => (kcal100g.get() * total.get() / 100).toFixed(2))</td>
-		<td><button type="button" onClick=(() => ctx.handleAddRow(row.id))>"+"</button></td>
-		<td><button type="button" onClick=(() => ctx.handleDeleteRow(row.id))>"-"</button></td>
+		<td><button type="button" onClick=(() => handleAddRow(row.id))>"+"</button></td>
+		<td><button type="button" onClick=(() => handleDeleteRow(row.id))>"-"</button></td>
 	</tr>
 }

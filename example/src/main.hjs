@@ -11,7 +11,7 @@ function Main() {
 		then(items => rows.set(items)).
 		catch(err => console.error('Failed to load ingredients', err))
 
-	ctx.handleAddRow = (id) => {
+	const handleAddRow = (id) => {
 		const items = [...rows.get()]
 		const pos = items.findIndex(x => x.id == id)
 		if (pos > -1) {
@@ -25,13 +25,13 @@ function Main() {
 		}
 	}
 
-	ctx.handleDeleteRow = (id) => {
+	const handleDeleteRow = (id) => {
 		rows.set(rows.get().filter((row) => row.id != id))
 	}
 
 	const tbodyNode = <tbody />
 	const diff = domdiff()
-	effect(_ => diff(tbodyNode, rows.get(), Row))
+	effect(_ => diff(tbodyNode, rows.get(), ctx.with({ handleAddRow, handleDeleteRow }, Row)))
 	return <table>tbodyNode</table>
 }
 
