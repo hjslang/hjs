@@ -12,8 +12,8 @@ export const createContext = () => {
         }
       },
     use: () => {
-      if (stack.length == 0) {
-        throw new Error("missing context");
+      if (stack.length === 0) {
+        throw new Error("ctx.use() was called outside ctx.with(values, fn)");
       }
       return stack[stack.length - 1];
     },
