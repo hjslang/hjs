@@ -1,8 +1,7 @@
-import { signal, effects, Render, domdiff } from '/libs/signals/html.js'
+import { signal, effect, Render, domdiff } from '/libs/signals/html.js'
 import { openDb, fetchIngredients } from './db.hjs'
 
 function Main() {
-	const efs = effects()
 	const rows = signal([])
 	
 	openDb().
@@ -28,7 +27,7 @@ function Main() {
 		rows.set(rows.get().filter((row) => row.id != id))
 	}
 
-	const  Row = (effect, row) => {
+	const  Row = (row) => {
 		const kcal100g = signal(row.kcal100g)
 		const total = signal(row.total)
 
@@ -58,7 +57,7 @@ function Main() {
 					value=(row.total)
 					onInput=(handleChangeTotal) />
 			</td>
-			<td>Render(effect, _ => (kcal100g.get() * total.get() / 100).toFixed(2))</td>
+			<td>Render(_ => (kcal100g.get() * total.get() / 100).toFixed(2))</td>
 			<td><button type="button" onClick=(() => handleAddRow(row.id))>"+"</button></td>
 			<td><button type="button" onClick=(() => handleDeleteRow(row.id))>"-"</button></td>
 		</tr>
@@ -66,7 +65,7 @@ function Main() {
 
 	const tbodyNode = <tbody />
 	const diff = domdiff()
-	efs.effect(_ => diff(tbodyNode, rows.get(), Row))
+	effect(_ => diff(tbodyNode, rows.get(), Row))
 	return <table>tbodyNode</table>
 }
 
