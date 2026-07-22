@@ -30,8 +30,7 @@ function Main() {
 	}
 
 	const tbodyNode = <tbody />
-	const diff = domdiff()
-	effect(_ => diff(tbodyNode, rows.get(), ctx.with({ handleAddRow, handleDeleteRow }, Row)))
+	effect(_ => domdiff(tbodyNode, rows.get(), ctx.with({ handleAddRow, handleDeleteRow }, Row)))
 	return <table>tbodyNode</table>
 }
 
