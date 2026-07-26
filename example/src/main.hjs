@@ -1,4 +1,4 @@
-import { signal, effect, domdiff } from '/libs/signals/html.js'
+import { signal, effect, domdiff } from '@gchumillas/usignals'
 import { openDb, fetchIngredients } from './db.hjs'
 import { ctx } from './context.hjs'
 import { Row } from './row.hjs'

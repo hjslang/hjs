@@ -1,4 +1,4 @@
-import { signal, Render } from '/libs/signals/html.js'
+import { signal, Render } from '@gchumillas/usignals'
 import { ctx } from './context.hjs'
 
 export const Row = (row) => {
