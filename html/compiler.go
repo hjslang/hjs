@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/xjslang/xjs/ast"
+	"github.com/xjslang/xjs/jsextended"
 	"github.com/xjslang/xjs/printer"
 )
 
@@ -39,4 +40,12 @@ func Compiler(pr *printer.Printer, node ast.Node, next func(node ast.Node) error
 		return next(node)
 	}
 	return nil
+}
+
+func Compile(result ast.Node) (string, error) {
+	pr := jsextended.PrinterBuilder().
+		UsePrinter(Compiler).
+		Build(printer.Compact())
+	pr.Print(result)
+	return pr.Output()
 }

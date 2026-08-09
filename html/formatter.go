@@ -2,6 +2,7 @@ package html
 
 import (
 	"github.com/xjslang/xjs/ast"
+	"github.com/xjslang/xjs/jsextended"
 	"github.com/xjslang/xjs/printer"
 )
 
@@ -27,4 +28,12 @@ func Formatter(pr *printer.Printer, node ast.Node, next func(node ast.Node) erro
 		return next(node)
 	}
 	return nil
+}
+
+func Format(result ast.Node, opts ...printer.Option) (string, error) {
+	pr := jsextended.PrinterBuilder().
+		UsePrinter(Formatter).
+		Build(opts...)
+	pr.Print(result)
+	return pr.Output()
 }
