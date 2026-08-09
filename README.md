@@ -22,9 +22,9 @@ import (
 
 func main() {
 	input := `let p = <p>
-  "Hello, "
-  <strong>"World!"</strong>
-</p>`
+	  "Hello, "
+	  <strong>"World!"</strong>
+	</p>`
 
 	// transform the input to AST
 	result, err := hjs.Parse([]byte(input))
@@ -33,7 +33,7 @@ func main() {
 	}
 
 	// transform the AST to valid JS code
-	jsCode, err := hjs.Compile(result, hjs.WithRuntime())
+	jsCode, err := hjs.Compile(result)
 	if err != nil {
 		panic(err)
 	}
@@ -64,9 +64,7 @@ You'll find more examples in [./hjs_test.go](./hjs_test.go).
 ```
 ./compiler.go  -- transform AST to valid JS code
 ./formatter.go -- transform AST to propertly formatted code
-./plugin.go    -- enrich the XJS parser
-./hjs.go       -- entry point
-./hjs_test.go  -- integration tests
+./parser.go    -- the parser
 ```
 
 **Main mage commands:**
