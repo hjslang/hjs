@@ -8,7 +8,6 @@ import (
 
 	"github.com/xjslang/hjs"
 	"github.com/xjslang/xjs/parser"
-	"github.com/xjslang/xjs/token"
 )
 
 func main() {
@@ -24,13 +23,13 @@ func main() {
 	}
 
 	// read input from stdin or file
-	var input []byte
+	var src []byte
 	var err error
 	if n := flag.NArg(); stdin && n == 0 {
-		input, err = io.ReadAll(os.Stdin)
+		src, err = io.ReadAll(os.Stdin)
 	} else if n == 1 {
 		source := flag.Arg(0)
-		input, err = os.ReadFile(source)
+		src, err = os.ReadFile(source)
 	} else {
 		cmd := os.Args[0]
 		fmt.Fprint(os.Stderr, "Usage:\n\n")
@@ -46,6 +45,7 @@ func main() {
 		os.Exit(1)
 	}
 
+	input := string(src)
 	switch {
 	case format:
 		result, err := hjs.Parse(input)
@@ -64,7 +64,7 @@ func main() {
 		if errList, ok := err.(parser.ErrorList); err == nil || ok {
 			fmt.Fprintf(os.Stdout, "{\"errors\": [\n")
 			for i, e := range errList {
-				var start, end token.Position
+				var start, end int
 				var msg, code string
 				if pe, ok := e.(parser.Error); ok {
 					start, end = pe.Range.Start, pe.Range.End
@@ -78,8 +78,8 @@ func main() {
 					fmt.Fprint(os.Stdout, ",\n")
 				}
 				fmt.Fprint(os.Stdout, "\t{\"range\": {")
-				fmt.Fprintf(os.Stdout, "\"start\": {\"line\": %d, \"column\": %d}, ", start.Line, start.Column)
-				fmt.Fprintf(os.Stdout, "\"end\": {\"line\": %d, \"column\": %d}}, ", end.Line, end.Column)
+				fmt.Fprintf(os.Stdout, "\"start\": {\"line\": %d, \"column\": %d}, ", start, start)
+				fmt.Fprintf(os.Stdout, "\"end\": {\"line\": %d, \"column\": %d}}, ", end, end)
 				fmt.Fprintf(os.Stdout, "\"message\": %q, ", msg)
 				fmt.Fprintf(os.Stdout, "\"code\": %q}", code)
 			}

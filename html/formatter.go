@@ -6,7 +6,7 @@ import (
 	"github.com/xjslang/xjs/printer"
 )
 
-func Formatter(pr *printer.Printer, node ast.Node, next func(node ast.Node) error) error {
+func Formatter(pr *printer.Printer, node ast.Node, next func(*printer.Printer, ast.Node) error) error {
 	switch v := node.(type) {
 	case *Tag:
 		pr.Space().Print(v.Layout.StartTag, v.Name)
@@ -25,7 +25,7 @@ func Formatter(pr *printer.Printer, node ast.Node, next func(node ast.Node) erro
 			pr.Print(v.Layout.EndTag, v.Name, ">")
 		}
 	default:
-		return next(node)
+		return next(pr, node)
 	}
 	return nil
 }

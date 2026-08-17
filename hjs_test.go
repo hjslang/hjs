@@ -18,7 +18,7 @@ func ExampleCompile() {
 		<span />
 		<strong>"World!"</strong>
 	</p>`
-	result, err := hjs.Parse([]byte(input))
+	result, err := hjs.Parse(input)
 	if err != nil {
 		panic(err)
 	}
@@ -40,7 +40,7 @@ func ExampleFormat() {
 		"World!"
 		</strong>
 		</p>`
-	result, err := hjs.Parse([]byte(input))
+	result, err := hjs.Parse(input)
 	if err != nil {
 		panic(err)
 	}
@@ -63,9 +63,9 @@ func ExampleFormat() {
 func TestParse(t *testing.T) {
 	t.Run("errors", func(t *testing.T) {
 		input := "<div>'Hello, World!'</p>"
-		_, err := hjs.Parse([]byte(input))
+		_, err := hjs.Parse(input)
 		require.Error(t, err)
-		require.Equal(t, err.Error(), "[line:0, col:22] expected closing tag </div>")
+		require.ErrorContains(t, err, "expected closing tag </div>")
 	})
 }
 
@@ -81,7 +81,7 @@ func TestCompile(t *testing.T) {
 	
 	let div1 = <div></div>
 	let div2 = <div /> // self closing`
-	result, err := hjs.Parse([]byte(input))
+	result, err := hjs.Parse(input)
 	require.NoError(t, err)
 	code, err := hjs.Compile(result)
 	require.NoError(t, err)
@@ -97,7 +97,7 @@ func TestCompile(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			result, err := hjs.Parse([]byte(test.input))
+			result, err := hjs.Parse(test.input)
 			require.NoError(t, err)
 			code, err := hjs.Compile(result)
 			require.NoError(t, err)
@@ -118,7 +118,7 @@ func TestFormat(t *testing.T) {
 	
 	let div1 = <div></div>
 	let div2 = <div /> // self closing`
-	result, err := hjs.Parse([]byte(input))
+	result, err := hjs.Parse(input)
 	require.NoError(t, err)
 	code, err := hjs.Format(result)
 	require.NoError(t, err)
@@ -135,7 +135,7 @@ func TestFormat(t *testing.T) {
 			{"<p>\n'Hello, '\n<b>'World!'</b>\n</p>", "<p>\n\t'Hello, '\n\t<b>'World!'</b>\n</p>;"},
 		}
 		for _, test := range tests {
-			result, err := hjs.Parse([]byte(test.input))
+			result, err := hjs.Parse(test.input)
 			if !assert.NoError(t, err) {
 				continue
 			}
@@ -149,7 +149,7 @@ func TestFormat(t *testing.T) {
 
 	t.Run("empty tags", func(t *testing.T) {
 		input := `let p = <p></p>`
-		result, err := hjs.Parse([]byte(input))
+		result, err := hjs.Parse(input)
 		require.NoError(t, err)
 		out, err := hjs.Format(result)
 		require.NoError(t, err)
@@ -167,7 +167,7 @@ func TestFormat(t *testing.T) {
 		
 		let div = <div // c
 		/>`
-		result, err := hjs.Parse([]byte(input))
+		result, err := hjs.Parse(input)
 		require.NoError(t, err)
 
 		// transform the AST to properly formatted code

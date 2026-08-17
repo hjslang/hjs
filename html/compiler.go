@@ -15,7 +15,7 @@ var (
 )
 
 // Compiler transforms the code to valid JS code.
-func Compiler(pr *printer.Printer, node ast.Node, next func(node ast.Node) error) error {
+func Compiler(pr *printer.Printer, node ast.Node, next func(*printer.Printer, ast.Node) error) error {
 	switch v := node.(type) {
 	case *Tag:
 		pr.Print("(function(){")
@@ -37,7 +37,7 @@ func Compiler(pr *printer.Printer, node ast.Node, next func(node ast.Node) error
 		}
 		pr.Print("return elem})()")
 	default:
-		return next(node)
+		return next(pr, node)
 	}
 	return nil
 }

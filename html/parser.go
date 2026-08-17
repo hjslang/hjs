@@ -92,13 +92,13 @@ func parseTag(p *parser.Parser) (node *Tag, err error) {
 }
 
 // Plugin enriches the JavaScript parser, so that we can parse expressions that are not part of the JS standard.
-func Parse(input []byte) (*js.Program, error) {
+func Parse(input string) (*js.Program, error) {
 	token.RegisterPrefixOp(START_TAG)
 
 	sb := jsextended.ScannerBuilder()
 	// now the parser can "scan" '<' and '</'
-	sb.UseScanner(func(sc *scanner.Scanner, next func() (token.Token, error)) (tok token.Token, err error) {
-		if tok, err = next(); err != nil {
+	sb.UseScanner(func(sc *scanner.Scanner, next func(*scanner.Scanner) (token.Token, error)) (tok token.Token, err error) {
+		if tok, err = next(sc); err != nil {
 			return
 		}
 		switch tok.Type {
@@ -122,11 +122,11 @@ func Parse(input []byte) (*js.Program, error) {
 		return
 	})
 	pb := jsextended.ParserBuilder()
-	pb.UsePrefixOpParser(func(p *parser.Parser, next func() (ast.Expr, error)) (_ ast.Expr, err error) {
+	pb.UsePrefixOpParser(func(p *parser.Parser, next func(*parser.Parser) (ast.Expr, error)) (_ ast.Expr, err error) {
 		if p.CurrentToken.Type == START_TAG {
 			return parseTag(p)
 		}
-		return next()
+		return next(p)
 	})
 	s := sb.Build(input)
 	p := pb.Build(s)
